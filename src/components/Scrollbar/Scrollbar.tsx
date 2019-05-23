@@ -47,7 +47,7 @@ export class Scrollbar extends React.PureComponent<IProps> {
     public render(): JSX.Element {
         const { viewportSize, extent, scrollPos, visibility } = this.props;
         const scrollWindow: number = viewportSize + extent;
-        let knobSize: number = Math.max(10, 0, viewportSize / scrollWindow * viewportSize);
+        let knobSize: number = Math.max(10, viewportSize / scrollWindow * viewportSize);
         knobSize = isNaN(knobSize) ? 0 : knobSize;
         this._maxTranslate = viewportSize - knobSize;
         this._scrollPerPixel = extent / this._maxTranslate;
