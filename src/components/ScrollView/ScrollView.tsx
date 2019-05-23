@@ -48,7 +48,7 @@ export class ScrollView extends React.Component<IProps, IState> {
     public static defaultProps: IProps = { wheelDelta: 20, allowWrap: false };
     private _container:  HTMLDivElement|null = null;
 
-    public constructor(props: any) {
+    public constructor(props: IProps) {
         super(props);
 
         this.state = {
