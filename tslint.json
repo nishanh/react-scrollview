@@ -1,0 +1,27 @@
+{
+    "extends": ["tslint:recommended", "tslint-react", "tslint-config-prettier"],
+    "rules": {
+      "semicolon": [true, "always"],
+      "ordered-imports": false,
+      "no-console": false,
+      "max-classes-per-file": [false, 1],
+      "no-string-literal": false,
+      "object-literal-sort-keys": false,
+      "quotemark": [true, "single", "jsx-double"],   
+      "jsx-boolean-value": false,
+      "member-ordering": false,
+      "variable-name": [
+        true,
+        "ban-keywords",
+        "allow-leading-underscore"
+      ]
+    },
+    "linterOptions": {
+      "exclude": [
+        ".storybook/**/*.js",
+        "dist/**/*.js",
+        "node_modules/**/*.ts"
+      ]
+    }
+  }
+  

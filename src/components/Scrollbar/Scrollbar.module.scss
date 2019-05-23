@@ -1,0 +1,57 @@
+
+/*************************************/
+/*            Definitions            */
+/*************************************/
+
+$knob-color: #484848;
+$body-color: #10161A;
+$hover-color: #686868;
+$scrollbar-size: 8px;
+$scrollbar-endcap: 4px;
+$transition-time: 0.2s;
+
+/*************************************/
+/*              Styles               */
+/*************************************/
+
+.vertScrollBarBody {
+    display: flex;
+    align-content: flex-start;
+    align-items: flex-start;
+    width: $scrollbar-size;
+    background-color: $body-color;
+    border-radius: $scrollbar-endcap;
+}
+
+.vertScrollBarKnob {
+    width: $scrollbar-size;
+    background-color: $knob-color;
+    border-radius: $scrollbar-endcap;
+    transition: background-color $transition-time;
+    transform: translateY(0px);
+}
+
+.vertScrollBarKnob:hover {
+    background-color: $hover-color;
+}
+
+.horzScrollBarBody {
+    display: flex;
+    align-content: flex-start;
+    align-items: flex-start;
+    height: $scrollbar-size;
+    background-color: $body-color;
+    border-radius: $scrollbar-endcap;
+}
+
+.horzScrollBarKnob {
+    height: $scrollbar-size;
+    background-color: $knob-color;
+    border-radius: $scrollbar-endcap;
+    transition: background-color $transition-time;
+    transform: translateX(0px);
+}
+
+.horzScrollBarKnob:hover {
+    background-color: $hover-color;
+}
