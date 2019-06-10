@@ -37,6 +37,7 @@ interface IState {
     scrollExtent: ISize;
     scrollVisibility: IScrollbarVisibility;
     scrollPosition: IPoint;
+    isScrolling: boolean;
 }
 
 /*************************************/
@@ -55,12 +56,15 @@ export class ScrollView extends React.Component<IProps, IState> {
             viewportSize: { width: 0, height: 0 },
             scrollExtent: { width: 0, height: 0 },
             scrollVisibility: { horizontal: false, vertical: false },
-            scrollPosition: { x: 0, y: 0 }
+            scrollPosition: { x: 0, y: 0 },
+            isScrolling: false
         };
 
         this.onResize = this.onResize.bind(this);
         this.onScroll = this.onScroll.bind(this);
         this.onScrollWheel = this.onScrollWheel.bind(this);
+        this.onScrollStart = this.onScrollStart.bind(this);
+        this.onScrollEnd = this.onScrollEnd.bind(this);
         this.setContainer = this.setContainer.bind(this);
     }
 
@@ -71,7 +75,7 @@ export class ScrollView extends React.Component<IProps, IState> {
                 <ResizeSensor onResize={this.onResize}>
                     <div 
                         className={styles.container}
-                        style={{whiteSpace: this.props.allowWrap ? 'normal' : 'nowrap'}}
+                        style={{whiteSpace: this.props.allowWrap ? 'normal' : 'nowrap', userSelect: this.state.isScrolling ? 'none' : 'unset'}}
                         onWheel={this.onScrollWheel}>
                         <div ref={this.setContainer} className={styles.contentArea}>
                             {this.props.children}
@@ -80,6 +84,8 @@ export class ScrollView extends React.Component<IProps, IState> {
                             className={styles.vertScrollbar}
                             orientation="vertical"
                             onScroll={this.onScroll}
+                            onScrollStart={this.onScrollStart}
+                            onScrollEnd={this.onScrollEnd}
                             scrollPos={this.state.scrollPosition.y}
                             visibility={this.state.scrollVisibility.vertical}
                             viewportSize={this.state.viewportSize.height}
@@ -88,6 +94,8 @@ export class ScrollView extends React.Component<IProps, IState> {
                             className={styles.horzScrollbar}
                             orientation="horizontal"
                             onScroll={this.onScroll}
+                            onScrollStart={this.onScrollStart}
+                            onScrollEnd={this.onScrollEnd}
                             scrollPos={this.state.scrollPosition.x}
                             visibility={this.state.scrollVisibility.horizontal}
                             viewportSize={this.state.viewportSize.width}
@@ -110,6 +118,14 @@ export class ScrollView extends React.Component<IProps, IState> {
         if (!this.setState || !entries || entries.length === 0) { return; }
         const { width, height } = entries[0].contentRect;
         this.setScrollState({width, height});
+    }
+
+    private onScrollStart(): void {
+        this.setState({isScrolling: true});
+    }
+
+    private onScrollEnd(): void {
+        this.setState({isScrolling: false});
     }
 
     private onScroll(position: number, rulerType: string): void {
