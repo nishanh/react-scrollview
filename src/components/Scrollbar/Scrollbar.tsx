@@ -17,17 +17,27 @@ interface IProps {
     scrollPos: number;
     visibility: boolean;
     onScroll: ScrollChangedEvent;
+    onScrollStart?: ScrollChangedEvent;
+    onScrollEnd?: ScrollChangedEvent;
     className?: string;
     style?: object;
 }
 
 type ScrollChangedEvent = (position: number, scrollType: string) => void;
 
+// tslint:disable-next-line
+function emptyFunc(): any {};
+
 /*************************************/
 /*          Class Definition         */
 /*************************************/
 
 export class Scrollbar extends React.PureComponent<IProps> {
+    public static defaultProps = {
+        onScrollStart: emptyFunc,
+        onScrollEnd: emptyFunc
+    };
+
     private _maxTranslate: number = 0;
     private _knobElement: HTMLDivElement|null = null;
     private _dragStart: number = 0;
@@ -82,11 +92,13 @@ export class Scrollbar extends React.PureComponent<IProps> {
         this._knobElement!.setPointerCapture(event.pointerId);
         this._dragStart = this.isVertical ? event.clientY : event.clientX;
         this._isScrolling = true;
+        this.props.onScrollStart!(this._scrollbarTranslation * this._scrollPerPixel, this.props.orientation);
     }
 
     private endScroll(event: React.PointerEvent<HTMLDivElement>): void {
         this._knobElement!.releasePointerCapture(event.pointerId);
         this._isScrolling = false;
+        this.props.onScrollEnd!(this._scrollbarTranslation * this._scrollPerPixel, this.props.orientation);
     }
 
     private lineScroll(event: React.PointerEvent<HTMLDivElement>): void {
