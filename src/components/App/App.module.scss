@@ -12,10 +12,8 @@ $border-color: #353535;
 /*************************************/
 
 .App {
-  box-sizing: initial;
   display: flex;
   height: 100vh;
-  width: 100vw;
   overflow: hidden;
   background-color: $app-background;
 }
@@ -39,6 +37,7 @@ $border-color: #353535;
   border: solid;
   border-width: 0px 0px 1px 0px;
   padding-bottom: 5px;
+  overflow: hidden;
 }
 
 .bottomSubPanel {
