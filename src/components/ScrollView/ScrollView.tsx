@@ -30,6 +30,8 @@ interface IScrollbarVisibility {
 interface IProps {
     wheelDelta?: number; // affects scroll sensitivity when using the mouse-wheel. Small value = slower scroll, large value = faster scroll 
     allowWrap?: boolean; // allow white-space wrap
+    style?: object;
+    className?: string;
 }
 
 interface IState {
@@ -79,9 +81,9 @@ export class ScrollView extends React.Component<IProps, IState> {
     public render(): JSX.Element|null {
         return (
             <div 
-                className={styles.container}
+                className={`${styles.container} ${this.props.className}`}
                 ref={this.setPanel}
-                style={{whiteSpace: this.props.allowWrap ? 'normal' : 'nowrap', userSelect: this.state.isScrolling ? 'none' : 'unset'}}
+                style={{...this.props.style, whiteSpace: this.props.allowWrap ? 'normal' : 'nowrap', userSelect: this.state.isScrolling ? 'none' : 'unset'}}
                 onWheel={this.onScrollWheel}>
                 <div ref={this.setContainer} className={styles.contentArea}>
                     <div ref={this.setWrapper}>
