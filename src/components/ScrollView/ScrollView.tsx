@@ -5,7 +5,7 @@
 
 import React from 'react';
 import styles from './ScrollView.module.scss';
-import { IResizeEntry, ResizeSensor } from '@blueprintjs/core';
+import ResizeObserver from 'resize-observer-polyfill';
 import { Scrollbar } from '..';
 
 /*************************************/
@@ -48,6 +48,11 @@ export class ScrollView extends React.Component<IProps, IState> {
     private static _scrollBarSize: number = 8;
     public static defaultProps: IProps = { wheelDelta: 20, allowWrap: false };
     private _container:  HTMLDivElement|null = null;
+    private _wrapper:  HTMLDivElement|null = null;
+    private _scrollPanel:  HTMLDivElement|null = null;
+    private _contentResizeObserver: ResizeObserver|null = null;
+    private _panelResizeObserver: ResizeObserver|null = null;
+    private _panelSize: ISize = { width: 0, height: 0 };
 
     public constructor(props: IProps) {
         super(props);
@@ -66,57 +71,78 @@ export class ScrollView extends React.Component<IProps, IState> {
         this.onScrollStart = this.onScrollStart.bind(this);
         this.onScrollEnd = this.onScrollEnd.bind(this);
         this.setContainer = this.setContainer.bind(this);
+        this.setWrapper = this.setWrapper.bind(this);
+        this.setPanel = this.setPanel.bind(this);
+        this.onContentResize = this.onContentResize.bind(this);
     }
 
     public render(): JSX.Element|null {
-        try {
-            React.Children.only(this.props.children);
-            return (
-                <ResizeSensor onResize={this.onResize}>
-                    <div 
-                        className={styles.container}
-                        style={{whiteSpace: this.props.allowWrap ? 'normal' : 'nowrap', userSelect: this.state.isScrolling ? 'none' : 'unset'}}
-                        onWheel={this.onScrollWheel}>
-                        <div ref={this.setContainer} className={styles.contentArea}>
-                            {this.props.children}
-                        </div>
-                        <Scrollbar 
-                            className={styles.vertScrollbar}
-                            orientation="vertical"
-                            onScroll={this.onScroll}
-                            onScrollStart={this.onScrollStart}
-                            onScrollEnd={this.onScrollEnd}
-                            scrollPos={this.state.scrollPosition.y}
-                            visibility={this.state.scrollVisibility.vertical}
-                            viewportSize={this.state.viewportSize.height}
-                            extent={this.state.scrollExtent.height}/>
-                        <Scrollbar 
-                            className={styles.horzScrollbar}
-                            orientation="horizontal"
-                            onScroll={this.onScroll}
-                            onScrollStart={this.onScrollStart}
-                            onScrollEnd={this.onScrollEnd}
-                            scrollPos={this.state.scrollPosition.x}
-                            visibility={this.state.scrollVisibility.horizontal}
-                            viewportSize={this.state.viewportSize.width}
-                            extent={this.state.scrollExtent.width}/>
+        return (
+            <div 
+                className={styles.container}
+                ref={this.setPanel}
+                style={{whiteSpace: this.props.allowWrap ? 'normal' : 'nowrap', userSelect: this.state.isScrolling ? 'none' : 'unset'}}
+                onWheel={this.onScrollWheel}>
+                <div ref={this.setContainer} className={styles.contentArea}>
+                    <div ref={this.setWrapper}>
+                        {this.props.children}
                     </div>
-                </ResizeSensor>
-            );
+                </div>
+                <Scrollbar 
+                    className={styles.vertScrollbar}
+                    orientation="vertical"
+                    onScroll={this.onScroll}
+                    onScrollStart={this.onScrollStart}
+                    onScrollEnd={this.onScrollEnd}
+                    scrollPos={this.state.scrollPosition.y}
+                    visibility={this.state.scrollVisibility.vertical}
+                    viewportSize={this.state.viewportSize.height}
+                    extent={this.state.scrollExtent.height}/>
+                <Scrollbar 
+                    className={styles.horzScrollbar}
+                    orientation="horizontal"
+                    onScroll={this.onScroll}
+                    onScrollStart={this.onScrollStart}
+                    onScrollEnd={this.onScrollEnd}
+                    scrollPos={this.state.scrollPosition.x}
+                    visibility={this.state.scrollVisibility.horizontal}
+                    viewportSize={this.state.viewportSize.width}
+                    extent={this.state.scrollExtent.width}/>
+            </div>
+        );
+    }
+
+    public componentDidMount(): void {
+        if (this._wrapper) {
+            this._contentResizeObserver = new ResizeObserver(this.onContentResize);
+            this._contentResizeObserver.observe(this._wrapper);
         }
-        catch(err) {
-            console.log('%cOnly one child can be specified with ScrollView. Enclose your items in a container div.', 'color: red;');
-            return null;
+        if (this._scrollPanel) {
+            this._panelResizeObserver = new ResizeObserver(this.onResize);
+            this._panelResizeObserver.observe(this._scrollPanel);
         }
+    }
+
+    private onContentResize(entries: any, observer: ResizeObserver): void {
+        this.setScrollState(this._panelSize);
     }
 
     private setContainer(containerDiv: HTMLDivElement): void {
         this._container = containerDiv;
     }
 
-    private onResize(entries: IResizeEntry[]): void {
+    private setWrapper(wrapperDiv: HTMLDivElement): void {
+        this._wrapper = wrapperDiv;
+    }
+
+    private setPanel(panelDiv: HTMLDivElement): void {
+        this._scrollPanel = panelDiv;
+    }
+
+    private onResize(entries: any, observer: ResizeObserver): void {
         if (!this.setState || !entries || entries.length === 0) { return; }
         const { width, height } = entries[0].contentRect;
+        this._panelSize = { width, height };
         this.setScrollState({width, height});
     }
 
@@ -154,7 +180,7 @@ export class ScrollView extends React.Component<IProps, IState> {
     private setScrollState(panelSize: ISize): void {
         const scrollPosition: IPoint = { x: this.state.scrollPosition.x, y: this.state.scrollPosition.y };
         const viewportSize: ISize = { width: panelSize.width, height: panelSize.height};
-        const itemsWrapper: HTMLDivElement = this._container!.children[0] as HTMLDivElement;
+        const itemsWrapper: HTMLDivElement = this._wrapper as HTMLDivElement;
 
         const scrollVisibility: IScrollbarVisibility = { 
             horizontal: Math.round(itemsWrapper.scrollWidth) > Math.round(viewportSize.width), 
