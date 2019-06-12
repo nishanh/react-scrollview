@@ -30,8 +30,6 @@ interface IScrollbarVisibility {
 interface IProps {
     wheelDelta?: number; // affects scroll sensitivity when using the mouse-wheel. Small value = slower scroll, large value = faster scroll 
     allowWrap?: boolean; // allow white-space wrap
-    style?: object;
-    className?: string;
 }
 
 interface IState {
@@ -81,9 +79,9 @@ export class ScrollView extends React.Component<IProps, IState> {
     public render(): JSX.Element|null {
         return (
             <div 
-                className={`${styles.container} ${this.props.className}`}
+                className={styles.container}
                 ref={this.setPanel}
-                style={{...this.props.style, whiteSpace: this.props.allowWrap ? 'normal' : 'nowrap', userSelect: this.state.isScrolling ? 'none' : 'unset'}}
+                style={{whiteSpace: this.props.allowWrap ? 'normal' : 'nowrap', userSelect: this.state.isScrolling ? 'none' : 'unset'}}
                 onWheel={this.onScrollWheel}>
                 <div ref={this.setContainer} className={styles.contentArea}>
                     <div ref={this.setWrapper}>
@@ -156,10 +154,10 @@ export class ScrollView extends React.Component<IProps, IState> {
         this.setState({isScrolling: false});
     }
 
-    private onScroll(position: number, rulerType: string): void {
+    private onScroll(position: number, scrollType: string): void {
         const scrollPosition: IPoint = {
-            x: rulerType === 'horizontal' ? position : this.state.scrollPosition.x,
-            y: rulerType === 'vertical' ? position : this.state.scrollPosition.y
+            x: scrollType === 'horizontal' ? position : this.state.scrollPosition.x,
+            y: scrollType === 'vertical' ? position : this.state.scrollPosition.y
         };
         this.setState(()=> ({scrollPosition}), () => {
             // Freakin microsoft...
