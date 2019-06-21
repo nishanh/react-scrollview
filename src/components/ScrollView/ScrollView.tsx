@@ -47,7 +47,7 @@ interface IState {
 /*************************************/
 
 export class ScrollView extends React.Component<IProps, IState> {
-    private static _scrollBarSize: number = 8;
+    private static _scrollBarSize: number = 8; // if you change this, change it in the scrollbar sass as well
     public static defaultProps: IProps = { wheelDelta: 20, allowWrap: false };
     private _container:  HTMLDivElement|null = null;
     private _wrapper:  HTMLDivElement|null = null;
